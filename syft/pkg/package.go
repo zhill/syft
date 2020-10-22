@@ -13,6 +13,12 @@ import (
 	"github.com/package-url/packageurl-go"
 )
 
+// For storing alternative identifers like pUrl, CPE, etc
+type PackageIdentifier struct {
+	Value string `json:"value"`
+	Type  string `json:"type"`
+}
+
 type ID int64
 
 // Package represents an application or library that has been bundled into a distributable format.
@@ -23,10 +29,12 @@ type Package struct {
 	FoundBy string           `json:"foundBy"`  // the specific cataloger that discovered this package
 	Source  []file.Reference `json:"sources"`  // the locations that lead to the discovery of this package (note: this is not necessarily the locations that make up this package)
 	// TODO: should we move licenses into metadata?
-	Licenses []string    `json:"licenses"`           // licenses discovered with the package metadata
-	Language Language    `json:"language"`           // the language ecosystem this package belongs to (e.g. JavaScript, Python, etc)
-	Type     Type        `json:"type"`               // the package type (e.g. Npm, Yarn, Egg, Wheel, Rpm, Deb, etc)
-	Metadata interface{} `json:"metadata,omitempty"` // additional data found while parsing the package source
+	Licenses             []string            `json:"licenses"`           // licenses discovered with the package metadata
+	Language             Language            `json:"language"`           // the language ecosystem this package belongs to (e.g. JavaScript, Python, etc)
+	Type                 Type                `json:"type"`               // the package type (e.g. Npm, Yarn, Egg, Wheel, Rpm, Deb, etc)
+	Metadata             interface{}         `json:"metadata,omitempty"` // additional data found while parsing the package source
+	AlternateIdentifiers []PackageIdentifier `json:"alternateIdentifiers"`
+	Vendor               string              `json:"vendor"` // Vendor if available. May be lib maintainer or distro (e.g. redhat, openssl)
 }
 
 // ID returns the package ID, which is unique relative to a package catalog.

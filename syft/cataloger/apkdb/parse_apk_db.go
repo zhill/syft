@@ -54,6 +54,8 @@ func parseApkDB(_ string, reader io.Reader) ([]pkg.Package, error) {
 				Licenses: strings.Split(metadata.License, " "),
 				Type:     pkg.ApkPkg,
 				Metadata: *metadata,
+				AlternateIdentifiers: []pkg.PackageIdentifier{},
+				Vendor: "alpine",
 			})
 		}
 	}

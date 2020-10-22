@@ -33,7 +33,7 @@ func parseDpkgStatus(_ string, reader io.Reader) ([]pkg.Package, error) {
 			Name:     entry.Package,
 			Version:  entry.Version,
 			Type:     pkg.DebPkg,
-			Metadata: entry,
+			Metadata: entry, Vendor:   "debian",
 		})
 	}
 

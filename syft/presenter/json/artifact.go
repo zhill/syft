@@ -12,7 +12,10 @@ type Artifact struct {
 	FoundBy   []string    `json:"foundBy"`
 	Locations Locations   `json:"locations,omitempty"`
 	Metadata  interface{} `json:"metadata,omitempty"`
+	Vendor    string      `json:"vendor"`
+	AlternateIdentifiers []pkg.PackageIdentifier `json:"alternateIdentifiers"`
 }
+
 
 func NewArtifact(p *pkg.Package, s scope.Scope) (Artifact, error) {
 	locations, err := NewLocations(p, s)
@@ -27,5 +30,7 @@ func NewArtifact(p *pkg.Package, s scope.Scope) (Artifact, error) {
 		FoundBy:   []string{p.FoundBy},
 		Locations: locations,
 		Metadata:  p.Metadata,
+		Vendor:    p.Vendor,
+		AlternateIdentifiers: p.AlternateIdentifiers,
 	}, nil
 }
