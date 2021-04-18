@@ -59,17 +59,18 @@ func candidateTargetSoftwareAttrs(p pkg.Package) []string {
 	var targetSw []string
 	switch p.Language {
 	case pkg.Java:
-		targetSw = append(targetSw, "java", "maven")
+		// Use the more specific indicator if available
+		if p.Type == pkg.JenkinsPluginPkg {
+			targetSw = append(targetSw, "jenkins", "cloudbees_jenkins")
+		} else {
+			targetSw = append(targetSw, "java", "maven")
+		}
 	case pkg.JavaScript:
 		targetSw = append(targetSw, "node.js", "nodejs")
 	case pkg.Ruby:
 		targetSw = append(targetSw, "ruby", "rails")
 	case pkg.Python:
 		targetSw = append(targetSw, "python")
-	}
-
-	if p.Type == pkg.JenkinsPluginPkg {
-		targetSw = append(targetSw, "jenkins", "cloudbees_jenkins")
 	}
 
 	return targetSw
@@ -103,10 +104,14 @@ func candidateProducts(p pkg.Package) []string {
 		if p.MetadataType == pkg.JavaMetadataType {
 			if metadata, ok := p.Metadata.(pkg.JavaMetadata); ok && metadata.PomProperties != nil {
 				// derive the product from the groupID (e.g. org.sonatype.nexus --> nexus)
-				if strings.HasPrefix(metadata.PomProperties.GroupID, "org.") || strings.HasPrefix(metadata.PomProperties.GroupID, "com.") {
-					fields := strings.Split(metadata.PomProperties.GroupID, ".")
-					if len(fields) >= 3 {
-						products = append(products, fields[2])
+				if pomGroupIDIsJenkinsPlugin(metadata.PomProperties.GroupID) {
+					products = append(products, productsForJenkinsPlugin(metadata.PomProperties.ArtifactID)...)
+				} else {
+					if strings.HasPrefix(metadata.PomProperties.GroupID, "org.") || strings.HasPrefix(metadata.PomProperties.GroupID, "com.") {
+						fields := strings.Split(metadata.PomProperties.GroupID, ".")
+						if len(fields) >= 3 {
+							products = append(products, fields[2])
+						}
 					}
 				}
 			}
@@ -115,4 +120,13 @@ func candidateProducts(p pkg.Package) []string {
 		return products
 	}
 	return products
+}
+
+// Determin if the GroupID is for a jenkins plugin: "com.cloudbees.jenkins.plugins"
+func pomGroupIDIsJenkinsPlugin(pomGroupId string) bool {
+	return pomGroupId == "com.cloudbees.jenkins.plugins"
+}
+
+func productsForJenkinsPlugin(artifactId string) []string {
+	return []string{artifactId, strings.Replace(artifactId, "-", "_", -1)}
 }
