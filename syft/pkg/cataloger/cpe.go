@@ -14,6 +14,7 @@ var productCandidatesByPkgType = candidateStore{
 	pkg.JavaPkg: {
 		"springframework": []string{"spring_framework", "springsource_spring_framework"},
 		"spring-core":     []string{"spring_framework", "springsource_spring_framework"},
+		"groovy-all":      []string{"groovy"},
 	},
 	pkg.NpmPkg: {
 		"hapi":             []string{"hapi_server_framework"},
